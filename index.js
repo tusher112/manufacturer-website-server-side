@@ -16,6 +16,13 @@ async function run(){
     try{
         await client.connect();
         console.log("database con")
+        const productsCollection=client.db('hexa-shop').collection('products');
+        app.get('/product', async (req, res) =>{
+          const query={};
+          const cursor=productsCollection.find(query);
+          const products=await cursor.toArray();
+          res.send(products);
+        })
     }
     finally{
 
