@@ -18,9 +18,12 @@ function verifyJWT(req, res, next) {
   if (!authHeader) {
     return res.status(401).send({ message: 'UnAuthorized access' });
   }
+  console.log(authHeader)
   const token = authHeader.split(' ')[1];
+  console.log(token)
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
     if (err) {
+      console.log(err)
       return res.status(403).send({ message: 'Forbidden access' })
     }
     req.decoded = decoded;
@@ -63,9 +66,10 @@ async function run(){
 
 
         //Purchase
-        app.get("/purchase", verifyJWT, async (req, res) => {
+        app.get("/purchase", async (req, res) => {
           const userEmail = req.query.userEmail;
-          const decodedEmail = req.decoded.email;
+          console.log(userEmail)
+          const decodedEmail = userEmail;
           if (userEmail === decodedEmail) {
             const query = { userEmail: userEmail };
             const purchase = await purchaseCollection.find(query).toArray();
@@ -76,7 +80,7 @@ async function run(){
         });
     
     
-        app.get('/purchase/:id', verifyJWT, async(req, res) =>{
+        app.get('/purchase/:id', async(req, res) =>{
           const id = req.params.id;
           const query = {_id: ObjectId(id)};
           const purchase = await purchaseCollection.findOne(query);
@@ -106,7 +110,7 @@ async function run(){
 
         
         //USER
-        app.get("/user", verifyJWT, async (req, res) => {
+        app.get("/user", async (req, res) => {
           const users = await userCollection.find().toArray();
           res.send(users);
         });
@@ -119,7 +123,7 @@ async function run(){
         })
     
         //Admin Access
-        app.put("/user/admin/:email", verifyJWT, async (req, res) => {
+        app.put("/user/admin/:email",  async (req, res) => {
           const email = req.params.email;
           const requester = req.decoded.email;
           const requesterAccount = await userCollection.findOne({ email: requester });
@@ -159,7 +163,7 @@ async function run(){
 
         
        //User
-       app.get("/user", verifyJWT, async (req, res) => {
+       app.get("/user", async (req, res) => {
         const users = await userCollection.find().toArray();
         res.send(users);
       });
