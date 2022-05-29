@@ -34,6 +34,9 @@ async function run(){
         await client.connect();
         console.log("database con")
         const productsCollection=client.db('hexa-shop').collection('products');
+        const userCollection=client.db('hexa-shop').collection('users');
+        const reviewsCollection=client.db('hexa-shop').collection('reviews');
+
         
         
         app.get('/product', async (req, res) =>{
@@ -43,12 +46,28 @@ async function run(){
           res.send(products);
         });
 
-
-        app.get('/user', verifyJWT, async (req, res) => {
-          const users = await userCollection.find().toArray();
-          res.send(users);
-          console.log("jwr")
+        //POST
+        app.post("/product", async (req, res) => {
+          const newProduct = req.body;
+          const result = await productsCollection.insertOne(newProduct);
+          res.send(result);
         });
+        
+
+        app.get('/review', async (req, res) =>{
+          const query={};
+          const cursor=reviewsCollection.find(query);
+          const reviews=await cursor.toArray();
+          res.send(reviews);
+        });
+        
+        //POST
+        app.post("/review", async (req, res) => {
+          const newReview = req.body;
+          const result = await reviewsCollection.insertOne(newReview);
+          res.send(result);
+        });
+        
 
 
     }
